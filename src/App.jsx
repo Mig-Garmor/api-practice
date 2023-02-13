@@ -1,34 +1,49 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import CountryCard from "./components/CountryCard";
+import SearchBar from "./components/SearchBar";
+
+import { fetchByCountry } from "./services/services";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [data, setData] = useState([]);
+  const [countryName, setCountryName] = useState("");
+
+  useEffect(() => {
+    fetchCountryData();
+  }, []);
+
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
+
+  const fetchCountryData = async () => {
+    try {
+      const result = await fetchByCountry("peru");
+      setData(result.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <SearchBar />
+      {data ? (
+        data.map((item) => {
+          return (
+            <CountryCard
+              name={item.name.common}
+              image={item.flags.png}
+              key={item.ccn3}
+            />
+          );
+        })
+      ) : (
+        <p>Data loading...</p>
+      )}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
